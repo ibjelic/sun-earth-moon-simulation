@@ -3,15 +3,6 @@ import numpy as np;
 import matplotlib.pyplot as plt;
 import sys;
 
-#https://blender.stackexchange.com/questions/3219/how-to-show-to-the-user-a-progression-in-a-script
-def update_progress(job_title, progress):
-    length = 20 # modify this to change the length
-    block = int(round(length*progress))
-    msg = "\r{0}: [{1}] {2}%".format(job_title, "#"*block + "-"*(length-block), round(progress*100, 2))
-    if progress >= 1: msg += " DONE\r\n"
-    sys.stdout.write(msg)
-    sys.stdout.flush()
-
 #initial conditions
 #https://nssdc.gsfc.nasa.gov/planetary/factsheet/index.html
 x1=1.00001423349; y1=0; x2=1.00258111495; y2=0; x3=0; y3=0; # [AU]
@@ -75,7 +66,10 @@ def energija(A): #system energy
 #cache for drawing
 x, y = [[], [], []], [[], [], []];
 t= np.zeros(n); E = np.zeros(n);
-
+size = [80,1,8720]
+clr = ['g','grey','gold'];
+#progress
+leng = 20;
 
 #simulation
 for i in range(n):
@@ -96,14 +90,18 @@ for i in range(n):
     Sn=zbir(copy.deepcopy(Sn),copy.deepcopy(rk));
     #set new state
     S=copy.deepcopy(Sn);
-    update_progress("Simulacija", i/n)
+    #progress bar
+    block = int(round(leng*i/n))
+    msg = "\r{0}: [{1}] {2}%".format("Simulacija", "#"*block + "-"*(leng-block), round(i/n*100, 2))
+    sys.stdout.write(msg); sys.stdout.flush();
 
-update_progress("Simulacija", 1)
-colors = ['r','g','b'];
+msg = "\r{0}: [{1}] {2}% DONE\r\n".format("Simulacija", "#"*block + "-"*(leng-block), round(n/n*100, 2))
+sys.stdout.write(msg); sys.stdout.flush();
+
 #plt.plot(E,t);
 plt.title("T= {} days".format(n*dt)); plt.xlabel('x [AU]'); plt.ylabel('y [AU]');
 for i in range(3):
-    plt.scatter(x[i][0],y[i][0],color=colors[i]);
-    plt.plot(x[i], y[i], color=colors[i]);
+    plt.scatter(x[i][0],y[i][0],color=clr[i],s=size[i]);
+    plt.plot(x[i], y[i], color=clr[i]);
 
 plt.show();
